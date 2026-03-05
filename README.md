@@ -1,66 +1,126 @@
-# How to Create a Free Windows 10 RDP using GitHub | Getscreen Method | 30 min timelimit bypassed
+# Google Maps Business Extractor → Google Sheets
 
-Hey there, tech enthusiasts! Welcome to this step-by-step guide on setting up your very own free Windows 10 RDP using the powerful combo of GitHub and the Getscreen method. 🚀
+A full-stack web tool that scrapes Google Maps business listings from user-defined search criteria and exports results to:
+- Google Sheets (append mode)
+- CSV download
+- JSON download
 
-## Introduction
+Backend is **FastAPI + Playwright + Pandas + gspread**, with a simple dashboard UI and daily scheduling support.
 
-Let's kick things off by breaking down the process into simple, digestible chunks. No worries if you're new to this – we'll walk you through it. If you haven't got a GitHub account yet, don't sweat it! Check out our quick [video tutorial on creating a GitHub account]
-## Getscreen Account Setup
+## Features
 
-Alright, let's get that [Getscreen](https://getscreen.me/en/registration) account rolling. Creating an account there is a breeze, and I'll show you how – it'll take literally 1 second! Just copy your Getscreen email to a textpad – we promise it's that easy. ⚡
+- Search keyword + location query (`keyword + location`)
+- User-defined max result count
+- Field selection:
+  - Business Name
+  - Address
+  - Phone Number
+  - Website
+  - Rating
+  - Total Reviews
+  - Google Maps URL
+  - Category
+- Start/Stop extraction jobs
+- Live progress and preview table
+- Duplicate filtering (by listing URL)
+- Dynamic scrolling to load more results
+- Random delays and user-agent rotation (basic anti-blocking strategy)
+- Export result files (CSV/JSON)
+- Google Sheets append integration with header management
+- Daily schedule creation (UTC HH:MM)
 
-## Downloading the GitHub Workflow
+## Project Structure
 
-Now, let's snag that GitHub workflow. In the [description] Telegram(https://t.me/donyface), you'll find links to different mirrors. It's like having backup plans for your backup plans! If the server decides to snooze, you're covered. Oh, and don't worry about mirror links – we've got an explanatory 
+```text
+RDP/
+├── app.py                  # FastAPI backend, scraper, scheduler, export APIs
+├── requirements.txt
+├── README.md
+├── exports/                # Generated CSV/JSON files
+└── static/
+    ├── index.html          # Dashboard UI
+    ├── styles.css          # UI styles
+    └── app.js              # Frontend logic + polling
+```
 
-## Video Tutorial In Youtube (H0w To)
-# [Watch The Video]
+## Prerequisites
 
-## Let's Get Started!
+- Python 3.10+
+- Chromium dependencies (for Playwright)
+- Google Cloud service account (for Sheets integration)
 
-Alright, tech champs, it's time to put the pieces together. You've got your GitHub account, your shiny new Getscreen account, and that trusty GitHub workflow. Ready to dive in? Let's roll!
+## Local Setup
 
-### Tutorial Walkthrough
+1. **Clone & enter project**
+   ```bash
+   cd /workspace/RDP
+   ```
 
-1. Head over to GitHub, create a new public repository, and click that "Upload files" button.
-2. Remember that workflow file you downloaded? Drag and drop those files like a pro coder!
-3. If you're on mobile, don't stress – we've got your back.
+2. **Create and activate virtual environment**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
 
-### Adding Workflow Files
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   playwright install chromium
+   ```
 
-1. Upload that readme.md file first.
-2. Create a new file, name it ".github/workflows/test", commit those changes.
-3. Add two workflow files – easy-peasy!
+4. **Run server**
+   ```bash
+   uvicorn app:app --reload --host 0.0.0.0 --port 8000
+   ```
 
-### ADDING YOUR GETSCREEN MAIL TO WORKFLOWS (importaint part)
+5. **Open app**
+   - `http://localhost:8000`
 
-1. Click one of workflows and find this "EMAIL_SECRET=Your Get Screen Mail" 
-2. Replace your copied mail in here , ex: "EMAIL_SECRET=example@gmail.com"
-3. Do same as to the other workflow. If you dosen't get this right you will not get rdp so watch the video
+## Google Sheets API Configuration (gspread)
 
-### Running the Workflow
+1. Go to Google Cloud Console.
+2. Create/select a project.
+3. Enable **Google Sheets API** and **Google Drive API**.
+4. Create a **Service Account**.
+5. Create a JSON key and download it.
+6. Save it in project root as:
+   - `google_service_account.json`
+   - or any path you provide in the UI (`Credentials File`).
+7. Open your target Google Sheet and share it with the service-account email (Editor access).
+8. Paste the Google Sheet URL into the dashboard.
 
-Woo-hoo! Here comes the fun part:
-1. Click on the "Actions" tab.
-2. Choose one of those workflows.
-3. Hit "Run workflow".
-4. If you don't see your run, just give it a quick refresh.
-5. Click on the workflow run, hit "Build now", and then... it's waiting time!
+## How to Use
 
-### Getscreen and Connect
+1. Enter keyword, location, and max results.
+2. Select fields to extract.
+3. Optionally add Google Sheet URL and credentials file path.
+4. Click **Start Extraction**.
+5. Monitor live progress and preview rows.
+6. Download CSV/JSON when finished.
+7. (Optional) Schedule a daily run using UTC time (`HH:MM`).
 
-Once the workflow wraps up:
-1. Check Getscreen – your RDP will be grinning with a green dot!
-2. Green means go, right? Click "Connect" and say hello to your RDP buddy.
-3. Runneradmin, prepare to meet your new best friend!
+## API Endpoints
 
-### Speed Test and Conclusion
+- `GET /` - dashboard UI
+- `POST /api/start` - start extraction
+- `POST /api/stop/{job_id}` - stop running extraction
+- `GET /api/status/{job_id}` - job status + preview rows + export links
+- `GET /api/export/csv/{job_id}` - CSV download
+- `GET /api/export/json/{job_id}` - JSON download
+- `POST /api/schedule` - create daily job
+- `GET /api/schedule` - list schedules
+- `DELETE /api/schedule/{scheduled_job_id}` - remove schedule
+- `GET /api/fields` - available selectable fields
 
-Let's wrap it up with a snappy speed test – after all, you deserve a lightning-fast RDP experience! There you have it, your very own Windows 10 RDP, set up and ready for action.
+## Notes & Reliability
 
-## Final Thoughts
+- Google Maps DOM may change over time; selectors may require maintenance.
+- Scraping Google Maps can trigger rate-limits/challenges. Mitigations included:
+  - randomized delays
+  - user-agent rotation
+  - controlled extraction pacing
+- For larger-scale extraction, consider proxy rotation and robust queue persistence.
 
-As we wrap things up, here's a tip – if the first run doesn't quite get you an RDP, don't stress. Give it another shot, and remember, moderation is key. Use this method wisely to keep it going!
+## Legal / Compliance
 
-
-Thanks for joining us on this tech journey. Remember, tech adventures can be both fun and straightforward. Drop a star ⭐️ if you found this guide helpful, hit that "Follow" button, and we'll catch you in the next tutorial. Stay tech-savvy, stay awesome! 🎉
+Ensure your usage complies with Google Maps terms of service and local laws.
