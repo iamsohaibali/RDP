@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Maps Extractor</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Google Maps Business Extractor</h1>
+
+    <section class="panel">
+      <h2>Search Configuration</h2>
+      <div class="grid">
+        <label>Keyword<input id="keyword" placeholder="restaurants" /></label>
+        <label>Location<input id="location" placeholder="New York" /></label>
+        <label>Max Results<input id="maxResults" type="number" value="20" min="1" max="500" /></label>
+        <label>Google Sheet URL (optional)<input id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/..." /></label>
+        <label>Credentials File (optional)<input id="credsPath" value="google_service_account.json" /></label>
+      </div>
+
+      <h3>Fields</h3>
+      <div id="fields" class="checkbox-grid"></div>
+
+      <div class="actions">
+        <button id="startBtn">Start Extraction</button>
+        <button id="stopBtn" class="danger" disabled>Stop</button>
+      </div>
+
+      <h3>Schedule Daily Job (UTC)</h3>
+      <div class="grid schedule">
+        <label>Run Time HH:MM<input id="runTime" placeholder="09:30" /></label>
+        <button id="scheduleBtn">Schedule Daily</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Progress</h2>
+      <p id="statusText">Idle</p>
+      <div class="progress"><div id="bar"></div></div>
+      <div id="exports" class="exports"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Preview</h2>
+      <table id="previewTable">
+        <thead><tr id="headerRow"></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
